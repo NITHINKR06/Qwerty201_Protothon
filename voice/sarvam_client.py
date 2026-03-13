@@ -58,6 +58,9 @@ def translate_text(text: str, source_lang: str = "hi-IN", target_lang: str = "en
     if not client:
         return f"[Mock Translation {source_lang}->{target_lang}]: {text}"
 
+    if source_lang == target_lang:
+        return text
+
     try:
         response = client.text.translate(
             input=text,
