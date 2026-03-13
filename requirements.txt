@@ -2,11 +2,6 @@
 # Hackathon Project - Python Dependencies
 # ============================================
 
-# --- Google ADK (Agent Development Kit) ---
-google-adk>=0.1.0
-google-genai>=1.0.0
-google-cloud-aiplatform>=1.40.0
-
 # --- Sarvam AI (Voice) ---
 sarvamai>=0.1.0
 requests>=2.31.0
