@@ -48,6 +48,11 @@ if __name__ == "__main__":
             patient_transcript = transcribe_audio(audio_file, source_lang="unknown")
             print(f"   🗣️  Heard: {patient_transcript}")
 
+            import sys
+            if not patient_transcript or patient_transcript.strip() == "":
+                print("\n⚠️  No speech detected. Skipping the rest of the pipeline.")
+                sys.exit(0)
+
             # 3. Detect the language of the transcribed text
             print("\n2. Detecting language...")
             detected_lang = detect_language(patient_transcript)
