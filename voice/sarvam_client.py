@@ -1,21 +1,16 @@
-"""
-Sarvam AI Voice Handler
-========================
-Provides TTS, STT, and Translation using the Sarvam AI SDK.
-"""
-
 import os
 import base64
-from dotenv import load_dotenv
 from sarvamai import SarvamAI
+from dotenv import load_dotenv
 
-# Load the root .env file where the API keys are located
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
-
-SARVAM_API_KEY = os.getenv("SARVAM_API_KEY")
+load_dotenv()
 
 # Initialize the Sarvam AI SDK Client
-client = SarvamAI(api_subscription_key=SARVAM_API_KEY) if SARVAM_API_KEY else None
+api_key = os.getenv("SARVAM_API_KEY")
+if not api_key:
+    print("Warning: No SARVAM_API_KEY found in environment variables.")
+
+client = SarvamAI(api_subscription_key=api_key) if api_key else None
 
 
 def transcribe_audio(audio_file_path: str, source_lang: str = "hi-IN") -> str:
@@ -49,6 +44,7 @@ def detect_language(text: str) -> str:
 
     try:
         response = client.text.identify_language(input=text)
+        # Response has .language_code
         return response.language_code
     except Exception as e:
         print(f"Error in detect_language: {e}")
@@ -57,7 +53,7 @@ def detect_language(text: str) -> str:
 
 def translate_text(text: str, source_lang: str = "hi-IN", target_lang: str = "en-IN") -> str:
     """
-    Translation between languages using Sarvam text translation.
+    Translation from regional languages to English using Sarvam.
     """
     if not client:
         return f"[Mock Translation {source_lang}->{target_lang}]: {text}"
@@ -117,9 +113,3 @@ def text_to_speech(text: str, language: str = "hi-IN", output_file: str = "outpu
     except Exception as e:
         print(f"Error in text_to_speech: {e}")
         return ""
-
-
-if __name__ == "__main__":
-    # Quick test
-    print("🎙️  Sarvam Voice Handler loaded.")
-    print(f"   API Key configured: {'✅' if SARVAM_API_KEY else '❌'}")
