@@ -1,0 +1,42 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spark / Delta Lake
+data/delta/
+data/spark-warehouse/
+metastore_db/
+derby.log
+spark-warehouse/
+
+# Airflow
+airflow/logs/
+airflow/airflow.db
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/

@@ -1,0 +1,111 @@
+version: "3.8"
+
+services:
+  # ─── Google ADK Agent ───────────────────────────
+  agent:
+    build:
+      context: .
+      dockerfile: agents/Dockerfile
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./agents:/app/agents
+      - ./data:/app/data
+    depends_on:
+      - spark-master
+    networks:
+      - hackathon-net
+
+  # ─── Sarvam Voice Service ──────────────────────
+  voice:
+    build:
+      context: .
+      dockerfile: voice/Dockerfile
+    env_file: .env
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./voice:/app/voice
+    networks:
+      - hackathon-net
+
+  # ─── Apache Airflow ────────────────────────────
+  airflow-webserver:
+    image: apache/airflow:2.8.0-python3.11
+    env_file: .env
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./pipelines/dags:/opt/airflow/dags
+      - ./pipelines/logs:/opt/airflow/logs
+    depends_on:
+      - postgres
+    command: webserver
+    networks:
+      - hackathon-net
+
+  airflow-scheduler:
+    image: apache/airflow:2.8.0-python3.11
+    env_file: .env
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+    volumes:
+      - ./pipelines/dags:/opt/airflow/dags
+      - ./pipelines/logs:/opt/airflow/logs
+    depends_on:
+      - postgres
+    command: scheduler
+    networks:
+      - hackathon-net
+
+  # ─── PostgreSQL (Airflow backend) ──────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - hackathon-net
+
+  # ─── Apache Spark Master ───────────────────────
+  spark-master:
+    image: bitnami/spark:3.5
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "7077:7077"
+      - "8082:8080"
+    volumes:
+      - ./data:/data
+    networks:
+      - hackathon-net
+
+  # ─── Apache Spark Worker ───────────────────────
+  spark-worker:
+    image: bitnami/spark:3.5
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    volumes:
+      - ./data:/data
+    networks:
+      - hackathon-net
+
+volumes:
+  postgres-data:
+
+networks:
+  hackathon-net:
+    driver: bridge
