@@ -66,9 +66,10 @@ class ConsultRequest(BaseModel):
 @app.post('/consultation')
 def consultation(req: ConsultRequest):
     record = generate_clinical_record(req.transcript, req.patient_id)
+    record_id = str(uuid.uuid4())
     conn = sqlite3.connect('vaidika.db')
     conn.execute('INSERT INTO consultations VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-        (str(uuid.uuid4()), req.patient_id, req.transcript,
+        (record_id, req.patient_id, req.transcript,
          json.dumps(record.symptoms), record.diagnosis,
          json.dumps(record.prescriptions),
          json.dumps(record.lab_tests), record.severity,
@@ -76,7 +77,7 @@ def consultation(req: ConsultRequest):
          datetime.datetime.now().isoformat()))
     conn.commit()
     conn.close()
-    return record
+    return {**record.dict(), 'record_id': record_id}
 
 class DeptUpdate(BaseModel):
     patient_id: str
@@ -116,6 +117,7 @@ def full_record(patient_id: str):
             'age': patient[2], 'language': patient[4]
         },
         'consultation': {
+            'record_id': consult[0] if consult else '',
             'symptoms': json.loads(consult[3]) if consult else [],
             'diagnosis': consult[4] if consult else '',
             'prescriptions': json.loads(consult[5]) if consult else [],
@@ -131,4 +133,4 @@ def full_record(patient_id: str):
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host='[IP_ADDRESS]', port=8000, reload=True)
+    uvicorn.run(app, host='0.0.0.0', port=8000, reload=True)
