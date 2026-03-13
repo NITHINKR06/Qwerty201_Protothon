@@ -26,6 +26,9 @@ Thumbs.db
 # Spark / Delta Lake
 data/delta/
 data/spark-warehouse/
+
+# SQLite Patient Registry
+data/registry/
 metastore_db/
 derby.log
 spark-warehouse/
