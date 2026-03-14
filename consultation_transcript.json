@@ -1,0 +1,87 @@
+{
+  "consultation_date": "2026-03-14T04:42:38.536061",
+  "patient_language": "hi-IN",
+  "total_turns": 10,
+  "transcript": [
+    {
+      "turn": 1,
+      "role": "doctor",
+      "text": "Hello, hello, hello, what is your name?",
+      "translated": "नमस्ते, नमस्ते, नमस्ते, आपका नाम क्या है?",
+      "language": "en-IN",
+      "timestamp": "[00:00:00]"
+    },
+    {
+      "turn": 2,
+      "role": "doctor",
+      "text": "I'm correct, I'm correct. There are three.",
+      "translated": "मैं सही हूँ, मैं सही हूँ। तीन हैं।",
+      "language": "en-IN",
+      "timestamp": "[00:00:13]"
+    },
+    {
+      "turn": 3,
+      "role": "doctor",
+      "text": "So in this case, my first one was not working for the first 2 hours. Now I'm finding my mic was never there.",
+      "translated": "तो इस मामले में, मेरा पहला वाला पहले 2 घंटों तक काम नहीं कर रहा था। अब मुझे ज्ञात हुआ कि मेरा माइक वहाँ नहीं था।",
+      "language": "en-IN",
+      "timestamp": "[00:00:31]"
+    },
+    {
+      "turn": 4,
+      "role": "doctor",
+      "text": "Doesn't matter. It's really everyone is going to take a turn.",
+      "translated": "कोई बात नहीं। वास्तव में सभी को बारी आएगी।",
+      "language": "en-IN",
+      "timestamp": "[00:00:52]"
+    },
+    {
+      "turn": 5,
+      "role": "doctor",
+      "text": "What? No no red. Go go. Be ready.",
+      "translated": "क्या? नहीं, लाल नहीं है। जाइए जाइए। तैयार रहिए।",
+      "language": "en-IN",
+      "timestamp": "[00:01:14]"
+    },
+    {
+      "turn": 6,
+      "role": "doctor",
+      "text": "Wait, wait, wait. Still digit tested?",
+      "translated": "ठहरिए, ठहरिए, ठहरिए। अभी भी अंक परीक्षण किया जा रहा है?",
+      "language": "en-IN",
+      "timestamp": "[00:01:28]"
+    },
+    {
+      "turn": 7,
+      "role": "doctor",
+      "text": "For my first canvas and off the watch. Hello hello hello.",
+      "translated": "मेरे पहले कैनवास के लिए और देखने के लिए। नमस्ते नमस्ते नमस्ते।",
+      "language": "en-IN",
+      "timestamp": "[00:01:44]"
+    },
+    {
+      "turn": 8,
+      "role": "doctor",
+      "text": "There is something called a",
+      "translated": "कुछ ऐसा है जिसे",
+      "language": "en-IN",
+      "timestamp": "[00:01:59]"
+    },
+    {
+      "turn": 9,
+      "role": "doctor",
+      "text": "No, no, no, it's not. Maybe like that, but because.",
+      "translated": "नहीं, नहीं, नहीं, यह नहीं है। शायद इस तरह से, लेकिन कारण से।",
+      "language": "en-IN",
+      "timestamp": "[00:02:11]"
+    },
+    {
+      "turn": 10,
+      "role": "doctor",
+      "text": "This is fake. You see that?",
+      "translated": "यह नकली है। आप देख रहे हैं?",
+      "language": "en-IN",
+      "timestamp": "[00:02:26]"
+    }
+  ]
+}

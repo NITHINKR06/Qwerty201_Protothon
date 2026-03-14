@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head><title>Mic + Sarvam STT Test</title></head>
+<body style="font-family:sans-serif; max-width:600px; margin:40px auto; padding:20px;">
+<h2>Mic + Sarvam STT Test</h2>
+<p>This page tests if your mic records properly and Sarvam STT works.</p>
+
+<button id="startBtn" onclick="startRecording()" style="padding:12px 24px; font-size:16px; background:green; color:white; border:none; border-radius:8px; cursor:pointer;">
+  Start Recording
+</button>
+<button id="stopBtn" onclick="stopRecording()" disabled style="padding:12px 24px; font-size:16px; background:red; color:white; border:none; border-radius:8px; cursor:pointer;">
+  Stop & Transcribe
+</button>
+
+<div id="status" style="margin:20px 0; padding:10px; background:#f0f0f0; border-radius:8px;">Ready</div>
+<div id="result" style="margin:20px 0; padding:10px; background:#e8f5e9; border-radius:8px; display:none;"></div>
+<pre id="log" style="font-size:12px; background:#000; color:#0f0; padding:15px; border-radius:8px; max-height:400px; overflow:auto;"></pre>
+
+<script>
+let mediaRecorder = null;
+let chunks = [];
+
+function log(msg) {
+  const el = document.getElementById('log');
+  el.textContent += new Date().toLocaleTimeString() + ' ' + msg + '\n';
+  el.scrollTop = el.scrollHeight;
+  console.log(msg);
+}
+
+async function startRecording() {
+  log('Requesting mic access...');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    log('Mic access granted! Tracks: ' + stream.getAudioTracks().length);
+    
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus' : 'audio/webm';
+    log('Using mimeType: ' + mimeType);
+    
+    mediaRecorder = new MediaRecorder(stream, { mimeType });
+    chunks = [];
+    
+    mediaRecorder.ondataavailable = (e) => {
+      log('Chunk received: ' + e.data.size + ' bytes');
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+    
+    mediaRecorder.onstart = () => log('MediaRecorder started');
+    mediaRecorder.onstop = () => log('MediaRecorder stopped, total chunks: ' + chunks.length);
+    mediaRecorder.onerror = (e) => log('MediaRecorder ERROR: ' + e.error);
+    
+    mediaRecorder.start(1000); // 1 second chunks
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    document.getElementById('status').textContent = 'Recording... Speak now!';
+    document.getElementById('status').style.background = '#ffcdd2';
+  } catch (err) {
+    log('MIC ERROR: ' + err.message);
+    document.getElementById('status').textContent = 'Mic error: ' + err.message;
+  }
+}
+
+async function stopRecording() {
+  if (!mediaRecorder) return;
+  
+  document.getElementById('stopBtn').disabled = true;
+  document.getElementById('status').textContent = 'Processing...';
+  document.getElementById('status').style.background = '#fff9c4';
+  
+  mediaRecorder.stop();
+  mediaRecorder.stream.getTracks().forEach(t => t.stop());
+  
+  // Wait for onstop
+  await new Promise(r => setTimeout(r, 500));
+  
+  log('Total chunks: ' + chunks.length);
+  const blob = new Blob(chunks, { type: 'audio/webm' });
+  log('Blob size: ' + blob.size + ' bytes');
+  
+  if (blob.size < 100) {
+    log('ERROR: Blob too small!');
+    document.getElementById('status').textContent = 'Error: No audio captured';
+    document.getElementById('startBtn').disabled = false;
+    return;
+  }
+  
+  // Send to backend
+  log('Sending to /api/voice/transcribe_upload...');
+  const fd = new FormData();
+  fd.append('file', blob, 'recording.webm');
+  fd.append('language', 'hi-IN');
+  
+  try {
+    const resp = await fetch('/api/voice/transcribe_upload', { method: 'POST', body: fd });
+    log('Response status: ' + resp.status);
+    const data = await resp.json();
+    log('Response data: ' + JSON.stringify(data, null, 2));
+    
+    const resultEl = document.getElementById('result');
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<b>Transcript:</b> ' + (data.transcript || '(empty)') +
+      '<br><b>Language:</b> ' + (data.detected_language || '?') +
+      '<br><b>English:</b> ' + (data.english_translation || '(empty)');
+    document.getElementById('status').textContent = 'Done!';
+    document.getElementById('status').style.background = '#c8e6c9';
+  } catch (err) {
+    log('FETCH ERROR: ' + err.message);
+    document.getElementById('status').textContent = 'API error: ' + err.message;
+  }
+  
+  document.getElementById('startBtn').disabled = false;
+}
+</script>
+</body>
+</html>
